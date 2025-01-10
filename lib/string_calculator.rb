@@ -23,12 +23,25 @@ class StringCalculator
     return [] if lines.empty?
 
     #parse delimiter characters
-    m = lines[0].match(/^\/\/((\[(.+)\])|(.))\z/)
-    delimiter_str = m ? (m[3] || m[4]) : ""
+    m = lines[0].match(/^\/\/((\[(.+?)\])*|(.))\z/) #//[***][%%] or //;
+    delimiter_arr = []
+    if m
+      if m[3]
+        #matches multiple character delimiter //[***][%%]
+        lines[0].scan(/\[(.+?)\]/) { |a| delimiter_arr << a[0] }
+      elsif m[4]
+        #matches single character delimiter
+        delimiter_arr << m[4]
+      end
+    else
+      #default delmiter ","
+      delimiter_arr << ","
+    end
     start = m ? 1 : 0
 
     num = "-?\\d+(\\.\\d+)?"
-    delimiter = "((#{Regexp.escape(delimiter_str)})|,)"
+    delimiter = delimiter_arr.map! { |a| "(#{Regexp.escape(a)})" }.join("|")
+    delimiter = "(#{delimiter})"
     valid_line_reg = Regexp.new("^(#{num}#{delimiter})*#{num}\\z")
     parse_reg = Regexp.new("(#{num})#{delimiter}?")
     

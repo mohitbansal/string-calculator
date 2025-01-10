@@ -57,10 +57,18 @@ RSpec.describe StringCalculator do
 
       context "with multiple character delimiter" do
         it "parses numbers" do
-          res = calculator.send(:numbers_from_string, "//[***]\n10***25***35,1***2\n-25***-9")
+          res = calculator.send(:numbers_from_string, "//[***]\n10***25***35\n1***2\n-25***-9")
           expect(res).to eq([10, 25, 35, 1, 2,-25,-9])
         end
       end
+
+      context "with multiple delimiters" do
+        it "parses numbers" do
+          res = calculator.send(:numbers_from_string, "//[***][%%]\n10***25%%35%%1***2")
+          expect(res).to eq([10, 25, 35, 1, 2])
+        end
+      end
+
       context "with empty line after delimiter" do
         it "returns empty array" do
           res = calculator.send(:numbers_from_string, "//[***]\n")
